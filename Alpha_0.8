@@ -9,7 +9,10 @@ echo "Installing..."
 cd Alpha_0.8/live-iso/
 
 cp "airootfs/etc/skel/.config/ksmserverrc" "/etc/skel/.config/ksmserverrc"
-for homedir in /home/*; do cp "airootfs/etc/skel/.config/ksmserverrc" "$homedir/.config/ksmserverrc"; done
+for homedir in /home/*; do
+    cp "airootfs/etc/skel/.config/ksmserverrc" "$homedir/.config/ksmserverrc"
+    chown -R $(stat . -c %u:%g) "$homedir/.config/ksmserverrc"
+done
 
 cp "pacman.conf" "/etc/pacman.conf"
 
@@ -18,10 +21,16 @@ pacman -Rsn --noconfirm dhclient
 systemctl disable systemd-timesyncd
 
 cp "airootfs/etc/skel/.config/klaunchrc" "/etc/skel/.config/klaunchrc"
-for homedir in /home/*; do cp "airootfs/etc/skel/.config/klaunchrc" "$homedir/.config/klaunchrc"; done
+for homedir in /home/*; do
+    cp "airootfs/etc/skel/.config/klaunchrc" "$homedir/.config/klaunchrc"
+    chown -R $(stat . -c %u:%g) "$homedir/.config/klaunchrc"
+done
 
 cp "airootfs/etc/skel/.local/share/applications/vim.desktop" "/etc/skel/.local/share/applications/vim.desktop"
-for homedir in /home/*; do cp "airootfs/etc/skel/.local/share/applications/vim.desktop" "$homedir/.local/share/applications/vim.desktop"; done
+for homedir in /home/*; do
+    cp "airootfs/etc/skel/.local/share/applications/vim.desktop" "$homedir/.local/share/applications/vim.desktop"
+    chown -R $(stat . -c %u:%g) "$homedir/.local/share/applications/vim.desktop"
+done
 
 pacman -S --noconfirm sddm --overwrite "/usr/share/sddm/*"
 
@@ -33,14 +42,23 @@ rm -rf /usr/share/wallpapers/NorcuxOS_Background.png /usr/share/about-distro/dis
 cp "airootfs/etc/xdg/kcm-about-distrorc" "/etc/xdg/kcm-about-distrorc"
 
 cp "airootfs/etc/skel/.config/kscreenlockerrc" "/etc/skel/.config/kscreenlockerrc"
-for homedir in /home/*; do cp "airootfs/etc/skel/.config/kscreenlockerrc" "$homedir/.config/kscreenlockerrc"; done
+for homedir in /home/*; do
+    cp "airootfs/etc/skel/.config/kscreenlockerrc" "$homedir/.config/kscreenlockerrc"
+    chown -R $(stat . -c %u:%g) "$homedir/.config/kscreenlockerrc"
+done
 
 cp "airootfs/etc/skel/.config/konsolerc" "/etc/skel/.config/konsolerc"
-for homedir in /home/*; do cp "airootfs/etc/skel/.config/konsolerc" "$homedir/.config/konsolerc"; done
+for homedir in /home/*; do
+    cp "airootfs/etc/skel/.config/konsolerc" "$homedir/.config/konsolerc"
+    chown -R $(stat . -c %u:%g) "$homedir/.config/konsolerc"
+done
 mkdir -p "/etc/skel/.local/share/konsole/"
 cp "airootfs/etc/skel/.local/share/konsole/NorcuxOS.colorscheme" "/etc/skel/.local/share/konsole/NorcuxOS.colorscheme"
 cp "airootfs/etc/skel/.local/share/konsole/NorcuxOS.profile" "/etc/skel/.local/share/konsole/NorcuxOS.profile"
-for homedir in /home/*; do cp -r "/etc/skel/.local/share/konsole/" "$homedir/.local/share/"; done
+for homedir in /home/*; do
+    cp -r "/etc/skel/.local/share/konsole/" "$homedir/.local/share/"
+    chown -R $(stat . -c %u:%g) "$homedir/.local/share/konsole/"
+done
 
 source /etc/os-release
 sed -i "/PRETTY_NAME=/c\PRETTY_NAME=\"$NAME Alpha 0.8\"" "/etc/os-release"
