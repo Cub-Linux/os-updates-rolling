@@ -40,7 +40,7 @@ for homedir in /home/*; do cp "airootfs/etc/skel/.config/konsolerc" "$homedir/.c
 mkdir -p "/etc/skel/.local/share/konsole/"
 cp "airootfs/etc/skel/.local/share/konsole/NorcuxOS.colorscheme" "/etc/skel/.local/share/konsole/NorcuxOS.colorscheme"
 cp "airootfs/etc/skel/.local/share/konsole/NorcuxOS.profile" "/etc/skel/.local/share/konsole/NorcuxOS.profile"
-for homedir in /home/*; do cp -r "/etc/skel/.local/share/konsole/" "$homedir/.local/share/konsole/"; done
+for homedir in /home/*; do cp -r "/etc/skel/.local/share/konsole/" "$homedir/.local/share/"; done
 
 source /etc/os-release
 sed -i "/PRETTY_NAME=/c\PRETTY_NAME=\"$NAME Alpha 0.8\"" "/etc/os-release"
