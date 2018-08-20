@@ -25,7 +25,7 @@ for homedir in /home/*; do cp "airootfs/etc/skel/.config/klaunchrc" "$homedir/.c
 cp "airootfs/etc/skel/.local/share/applications/vim.desktop" "/etc/skel/.local/share/applications/vim.desktop"
 for homedir in /home/*; do cp "airootfs/etc/skel/.local/share/applications/vim.desktop" "$homedir/.local/share/applications/vim.desktop"; done
 
-pacman -S sddm --overwrite "/usr/share/sddm/*"
+pacman -S --noconfirm sddm --overwrite "/usr/share/sddm/*"
 
 pacman -Rsn --noconfirm norcuxos-plasma-look-and-feel
 pacman -S --noconfirm norcuxos-plasma-theme
@@ -39,9 +39,9 @@ for homedir in /home/*; do cp "airootfs/etc/skel/.config/kscreenlockerrc" "$home
 
 cp "airootfs/etc/skel/.config/konsolerc" "/etc/skel/.config/konsolerc"
 for homedir in /home/*; do cp "airootfs/etc/skel/.config/konsolerc" "$homedir/.config/konsolerc"; done
+mkdir -p "/etc/skel/.local/share/konsole/"
 cp "airootfs/etc/skel/.local/share/konsole/NorcuxOS.colorscheme" "/etc/skel/.local/share/konsole/NorcuxOS.colorscheme"
-for homedir in /home/*; do cp "airootfs/etc/skel/.local/share/konsole/NorcuxOS.colorscheme" "$homedir/.local/share/konsole/NorcuxOS.colorscheme"; done
 cp "airootfs/etc/skel/.local/share/konsole/NorcuxOS.profile" "/etc/skel/.local/share/konsole/NorcuxOS.profile"
-for homedir in /home/*; do cp "airootfs/etc/skel/.local/share/konsole/NorcuxOS.profile" "$homedir/.local/share/konsole/NorcuxOS.profile"; done
+for homedir in /home/*; do cp "/etc/skel/.local/share/konsole/" "$homedir/.local/share/konsole/"; done
 
 echo "Done!"
