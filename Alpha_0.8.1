@@ -9,7 +9,10 @@ echo "Installing..."
 cd Alpha_0.8.1/live-iso/
 
 cp "airootfs/etc/skel/.config/ksplashrc" "/etc/skel/.config/ksplashrc"
-for homedir in /home/*; do cp "airootfs/etc/skel/.config/ksplashrc" "$homedir/.config/ksplashrc"; done
+for homedir in /home/*; do
+    cp "airootfs/etc/skel/.config/ksplashrc" "$homedir/.config/ksplashrc"
+    chown -R $(stat . -c %u:%g) "$homedir/.config/ksplashrc"
+done
 
 source /etc/os-release
 sed -i "/PRETTY_NAME=/c\PRETTY_NAME=\"$NAME Alpha 0.8.1\"" "/etc/os-release"
