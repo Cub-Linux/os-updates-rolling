@@ -1,69 +1,67 @@
-#!/bin/sh
-echo "Downloading files..."
-curl https://codeload.github.com/NorcuxOS/build-scripts-rolling/tar.gz/Alpha_0.8 --output Alpha_0.8.tar.gz
+#!/bin/bash
 
-echo "Unpacking files..."
-tar -xf Alpha_0.8.tar.gz --one-top-level=Alpha_0.8 --strip 1
+version=$(basename "$0")
+prettyversion=$(echo $version | tr "_" " ")
 
-echo "Installing..."
-cd Alpha_0.8/live-iso/
+if [ "$EUID" -ne 0 ]
+  then echo "This script must be run as root!"
+  exit
+fi
 
-cp "airootfs/etc/skel/.config/ksmserverrc" "/etc/skel/.config/ksmserverrc"
-for homedir in /home/*; do
-    cp "airootfs/etc/skel/.config/ksmserverrc" "$homedir/.config/ksmserverrc"
-    chown -R $(stat . -c %u:%g) "$homedir/.config/ksmserverrc"
-done
+#### Helper functions ####
 
-cp "pacman.conf" "/etc/pacman.conf"
+setVersion() {
+    source /etc/os-release
+    sed -i "/PRETTY_NAME=/c\PRETTY_NAME=\"$NAME $prettyversion\"" "/etc/os-release"
+    sed -i "/VERSION=/c\VERSION=\"$prettyversion\"" "/etc/os-release"
+    sed -i "/Version=/c\Version=$prettyversion" "/etc/xdg/kcm-about-distrorc"
+}
 
-pacman -Rsn --noconfirm dhclient
+copySkelFile() {
+    file="$1"
+    cp "airootfs/etc/skel/$file" "/etc/skel/$file"
+    for homedir in /home/*; do
+        cp "airootfs/etc/skel/$file" "$homedir/$file"
+        chown -R $(stat $homedir -c %u:%g) "$homedir/$file"
+    done
+}
 
-systemctl disable systemd-timesyncd
+#### OS Update ####
 
-cp "airootfs/etc/skel/.config/klaunchrc" "/etc/skel/.config/klaunchrc"
-for homedir in /home/*; do
-    cp "airootfs/etc/skel/.config/klaunchrc" "$homedir/.config/klaunchrc"
-    chown -R $(stat . -c %u:%g) "$homedir/.config/klaunchrc"
-done
+prepareOSUpdate() {
+    echo "Downloading files..."
+    curl -s https://codeload.github.com/NorcuxOS/build-scripts-rolling/tar.gz/$version | tar -xz --one-top-level=$version-files --strip 1
+}
 
-cp "airootfs/etc/skel/.local/share/applications/vim.desktop" "/etc/skel/.local/share/applications/vim.desktop"
-for homedir in /home/*; do
-    cp "airootfs/etc/skel/.local/share/applications/vim.desktop" "$homedir/.local/share/applications/vim.desktop"
-    chown -R $(stat . -c %u:%g) "$homedir/.local/share/applications/vim.desktop"
-done
+installOSUpdate() {
+    echo "Installing OS Update..."
+    cd "$version-files/live-iso/"
+    
+    # Install OS Update
+    copySkelFile ".config/ksmserverrc"
+    cp "pacman.conf" "/etc/pacman.conf"
+    pacman -Rsn --noconfirm dhclient
+    systemctl disable systemd-timesyncd
+    copySkelFile ".config/klaunchrc"
+    copySkelFile ".local/share/applications/vim.desktop"
+    pacman -S --noconfirm sddm --overwrite "/usr/share/sddm/*"
+    pacman -Rsn --noconfirm norcuxos-plasma-look-and-feel
+    pacman -S --noconfirm norcuxos-plasma-theme
+    pacman -S --noconfirm norcuxos-artwork
+    rm -rf /usr/share/wallpapers/NorcuxOS_Background.png /usr/share/about-distro/distribution-logo*
+    cp "airootfs/etc/xdg/kcm-about-distrorc" "/etc/xdg/kcm-about-distrorc"
+    copySkelFile ".config/kscreenlockerrc"
+    copySkelFile ".config/konsolerc"
+    copySkelFile ".local/share/konsole/NorcuxOS.colorscheme"
+    copySkelFile ".local/share/konsole/NorcuxOS.profile"
+    setVersion
 
-pacman -S --noconfirm sddm --overwrite "/usr/share/sddm/*"
+    # Clean up
+    cd ../../
+    rm -rf $version-files
+    
+    echo "Done!"
+}
 
-pacman -Rsn --noconfirm norcuxos-plasma-look-and-feel
-pacman -S --noconfirm norcuxos-plasma-theme
-
-pacman -S --noconfirm norcuxos-artwork
-rm -rf /usr/share/wallpapers/NorcuxOS_Background.png /usr/share/about-distro/distribution-logo*
-cp "airootfs/etc/xdg/kcm-about-distrorc" "/etc/xdg/kcm-about-distrorc"
-
-cp "airootfs/etc/skel/.config/kscreenlockerrc" "/etc/skel/.config/kscreenlockerrc"
-for homedir in /home/*; do
-    cp "airootfs/etc/skel/.config/kscreenlockerrc" "$homedir/.config/kscreenlockerrc"
-    chown -R $(stat . -c %u:%g) "$homedir/.config/kscreenlockerrc"
-done
-
-cp "airootfs/etc/skel/.config/konsolerc" "/etc/skel/.config/konsolerc"
-for homedir in /home/*; do
-    cp "airootfs/etc/skel/.config/konsolerc" "$homedir/.config/konsolerc"
-    chown -R $(stat . -c %u:%g) "$homedir/.config/konsolerc"
-done
-mkdir -p "/etc/skel/.local/share/konsole/"
-cp "airootfs/etc/skel/.local/share/konsole/NorcuxOS.colorscheme" "/etc/skel/.local/share/konsole/NorcuxOS.colorscheme"
-cp "airootfs/etc/skel/.local/share/konsole/NorcuxOS.profile" "/etc/skel/.local/share/konsole/NorcuxOS.profile"
-for homedir in /home/*; do
-    cp -r "/etc/skel/.local/share/konsole/" "$homedir/.local/share/"
-    chown -R $(stat . -c %u:%g) "$homedir/.local/share/konsole/"
-done
-
-source /etc/os-release
-sed -i "/PRETTY_NAME=/c\PRETTY_NAME=\"$NAME Alpha 0.8\"" "/etc/os-release"
-sed -i "/VERSION=/c\VERSION=\"Alpha 0.8\"" "/etc/os-release"
-sed -i "/Version=/c\Version=Alpha 0.8" "/etc/xdg/kcm-about-distrorc"
-
-echo ""
-echo "Done!"
+prepareOSUpdate
+installOSUpdate

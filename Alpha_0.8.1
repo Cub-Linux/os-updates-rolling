@@ -1,23 +1,51 @@
-#!/bin/sh
-echo "Downloading files..."
-curl https://codeload.github.com/NorcuxOS/build-scripts-rolling/tar.gz/Alpha_0.8.1 --output Alpha_0.8.1.tar.gz
+#!/bin/bash
 
-echo "Unpacking files..."
-tar -xf Alpha_0.8.1.tar.gz --one-top-level=Alpha_0.8.1 --strip 1
+version=$(basename "$0")
+prettyversion=$(echo $version | tr "_" " ")
 
-echo "Installing..."
-cd Alpha_0.8.1/live-iso/
+if [ "$EUID" -ne 0 ]
+  then echo "This script must be run as root!"
+  exit
+fi
 
-cp "airootfs/etc/skel/.config/ksplashrc" "/etc/skel/.config/ksplashrc"
-for homedir in /home/*; do
-    cp "airootfs/etc/skel/.config/ksplashrc" "$homedir/.config/ksplashrc"
-    chown -R $(stat . -c %u:%g) "$homedir/.config/ksplashrc"
-done
+#### Helper functions ####
 
-source /etc/os-release
-sed -i "/PRETTY_NAME=/c\PRETTY_NAME=\"$NAME Alpha 0.8.1\"" "/etc/os-release"
-sed -i "/VERSION=/c\VERSION=\"Alpha 0.8.1\"" "/etc/os-release"
-sed -i "/Version=/c\Version=Alpha 0.8.1" "/etc/xdg/kcm-about-distrorc"
+setVersion() {
+    source /etc/os-release
+    sed -i "/PRETTY_NAME=/c\PRETTY_NAME=\"$NAME $prettyversion\"" "/etc/os-release"
+    sed -i "/VERSION=/c\VERSION=\"$prettyversion\"" "/etc/os-release"
+    sed -i "/Version=/c\Version=$prettyversion" "/etc/xdg/kcm-about-distrorc"
+}
 
-echo ""
-echo "Done!"
+copySkelFile() {
+    file="$1"
+    cp "airootfs/etc/skel/$file" "/etc/skel/$file"
+    for homedir in /home/*; do
+        cp "airootfs/etc/skel/$file" "$homedir/$file"
+        chown -R $(stat $homedir -c %u:%g) "$homedir/$file"
+    done
+}
+
+#### OS Update ####
+
+prepareOSUpdate() {
+    echo "Downloading files..."
+    curl -s https://codeload.github.com/NorcuxOS/build-scripts-rolling/tar.gz/$version | tar -xz --one-top-level=$version-files --strip 1
+}
+
+installOSUpdate() {
+    echo "Installing OS Update..."
+    cd "$version-files/live-iso/"
+    
+    # Install OS Update
+    copySkelFile ".config/ksplashrc"
+
+    # Clean up
+    cd ../../
+    rm -rf $version-files
+    
+    echo "Done!"
+}
+
+prepareOSUpdate
+installOSUpdate
