@@ -50,8 +50,8 @@ installOSUpdate() {
     rm -rf "/etc/sudoers.d/g_wheel"
     copySkelFile ".kde4/share/apps/color-schemes/NorcuxOS.colors"
     copySkelFile ".local/share/color-schemes/NorcuxOS.colors"
-    copySkelFile ".config/freespacenotifier.notifyrc"
-    copySkelFile ".config/freespacenotifierrc"
+    rm -rf ".config/freespacenotifier.notifyrc"
+    rm -rf ".config/freespacenotifierrc"
     rm -rf "/etc/skel/.config/kded5rc"
     chmod 750 /root
     cp -aT /etc/skel/ /root/
