@@ -19,10 +19,12 @@ setVersion() {
 
 copySkelFile() {
     file="$1"
+    mkdir -p "$(dirname /etc/skel/$file)"
     cp "airootfs/etc/skel/$file" "/etc/skel/$file"
     for homedir in /home/*; do
+        mkdir -p "$(dirname $homedir/$file)"
         cp "airootfs/etc/skel/$file" "$homedir/$file"
-        chown -R $(stat $homedir -c %u:%g) "$homedir/$file"
+        chown -R $(stat $homedir -c %u:%g) "$(dirname $homedir/$file)"
     done
 }
 
