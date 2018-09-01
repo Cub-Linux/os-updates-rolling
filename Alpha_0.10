@@ -38,9 +38,13 @@ installOSUpdate() {
     cd "$version-files/live-iso/"
     
     # Install OS Update
-    copySkelFile ".config/ksplashrc"
+    cp "pacman.conf" "/etc/pacman.conf"
+    cp "airootfs/etc/default/grub" "/etc/default/grub"
+    cp "airootfs/etc/default/grub.silent" "/etc/default/grub.silent"
+    rm -rf /usr/share/wallpapers/{Autumn.jpg,Beautiful_Colourful_Houses_in_The_Netherlands.jpg,City_Night.jpg,City_White.jpeg,Dark_Forest_Fog.jpg,Forest.jpeg,Grass.jpg,Mountains.jpg,Mountains_Clouds_Forest_Trees.jpg,Ocean.jpeg,Winter.jpg,Wooden_Boards.jpg}
+    pacman -S --noconfirm norcuxos-wallpapers
     setVersion
-
+    
     # Clean up
     cd ../../
     rm -rf $version-files

@@ -38,7 +38,8 @@ installOSUpdate() {
     cd "$version-files/live-iso/"
     
     # Install OS Update
-    copySkelFile ".config/ksplashrc"
+    copySkelFile ".config/plasmarc"
+    copySkelFile ".config/kdeglobals"
     setVersion
 
     # Clean up

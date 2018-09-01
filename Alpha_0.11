@@ -38,7 +38,24 @@ installOSUpdate() {
     cd "$version-files/live-iso/"
     
     # Install OS Update
-    copySkelFile ".config/ksplashrc"
+    cp "airootfs/etc/default/grub" "/etc/default/grub"
+    cp "airootfs/etc/default/grub.silent" "/etc/default/grub.silent"
+    cp "mkinitcpio.conf" "/etc/mkinitcpio.conf"
+    pacman -Rsn --noconfirm plymouth norcuxos-plymouth-theme
+    copySkelFile ".config/katepartrc"
+    pacman -S --noconfirm kdeplasma-addons
+    cp "airootfs/etc/sudoers.d/defaultuser" "/etc/sudoers.d/defaultuser"
+    rm -rf "/etc/sudoers.d/g_wheel"
+    copySkelFile ".kde4/share/apps/color-schemes/NorcuxOS.colors"
+    copySkelFile ".local/share/color-schemes/NorcuxOS.colors"
+    copySkelFile ".config/freespacenotifier.notifyrc"
+    copySkelFile ".config/freespacenotifierrc"
+    rm -rf "/etc/skel/.config/kded5rc"
+    chmod 750 /root
+    cp -aT /etc/skel/ /root/
+    cp "pacman.conf" "/etc/pacman.conf"
+    cp "airootfs/etc/polkit-1/rules.d/00-early-checks.rules" "/etc/polkit-1/rules.d/00-early-checks.rules"
+    copySkelFile ".config/krunnerrc"
     setVersion
 
     # Clean up

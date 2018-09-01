@@ -38,7 +38,7 @@ installOSUpdate() {
     cd "$version-files/live-iso/"
     
     # Install OS Update
-    copySkelFile ".config/ksplashrc"
+    pacman -S --noconfirm reflector
     setVersion
 
     # Clean up
